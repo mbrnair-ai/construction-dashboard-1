@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dream Home Construction Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* --- same CSS as before --- */
+    :root {
+      --bg: #f4f6f9;
+      --bg-card: #ffffff;
+      --bg-dark: #1f2933;
+      --bg-card-dark: #243447;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --text-light: #f5f5f5;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --border: #d1d5db;
+    }
+    body.dark {
+      --bg: var(--bg-dark);
+      --bg-card: var(--bg-card-dark);
+      --text: var(--text-light);
+      --text-muted: #9ca3af;
+      --border: #374151;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    header .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    select, input[type="number"], input[type="text"], input[type="date"], input[type="password"] {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+    }
+    .tabs {
+      display: flex;
+      background: #111827;
+      color: #9ca3af;
+      padding: 0 10px;
+      overflow-x: auto;
+    }
+    .tab {
+      padding: 10px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .tab.active {
+      color: #f9fafb;
+      border-bottom: 2px solid var(--primary);
+      font-weight: 600;
+    }
+    main {
+      flex: 1;
+      padding: 16px;
+    }
+    .card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .summary-item {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+    }
+    .summary-item span.label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .summary-item span.value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    form .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #e5e7eb;
+      font-weight: 600;
+    }
+    body.dark th {
+      background: #111827;
+    }
+    .actions {
+      display: flex;
+      gap: 4px;
+    }
+    .hidden { display: none; }
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .login-box {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 20px;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .login-box h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .login-box .field {
+      margin-bottom: 10px;
+    }
+    .login-box label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .login-box input {
+      width: 100%;
+    }
+    .login-error {
+      color: #fca5a5;
+      font-size: 12px;
+      min-height: 16px;
+    }
+    .top-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+  </style>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF for PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SheetJS for Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>Construction Dashboard Login</h2>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="loginUser" value="mb" />
+    </div>
+    <div class="field">
+      <label>Password (set anything you like)</label>
+      <input type="password" id="loginPass" />
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="btn-primary" onclick="handleLogin()">Login</button>
+  </div>
+</div>
+
+<div class="app-shell" id="appShell" style="display:none;">
+  <header>
+    <div class="title">Dream Home Construction Dashboard</div>
+    <div class="controls">
+      <div class="top-right">
+        <label style="font-size:12px;color:#9ca3af;">Currency</label>
+        <select id="currencySelect" onchange="setCurrency(this.value)">
+          <option value="AED">AED</option>
+          <option value="INR">INR</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
+      </div>
+      <button class="btn-outline" onclick="toggleDarkMode()">Dark Mode</button>
+      <button class="btn-outline" onclick="exportAllCSV()">Export CSV</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard" onclick="showTab('dashboard')">Dashboard</div>
+    <div class="tab" data-tab="company" onclick="showTab('company')">Company Payments</div>
+    <div class="tab" data-tab="direct" onclick="showTab('direct')">Direct Purchases</div>
+    <div class="tab" data-tab="extra" onclick="showTab('extra')">Extra Expenses</div>
+    <div class="tab" data-tab="interior" onclick="showTab('interior')">Interior</div>
+    <div class="tab" data-tab="reports" onclick="showTab('reports')">Reports</div>
+    <div class="tab" data-tab="settings" onclick="showTab('settings')">Settings</div>
+  </div>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard">
+      <div class="card">
+        <div class="card-header">
+          <h2>Summary</h2>
+        </div>
+        <div class="grid-2">
+          <div class="summary-item">
+            <span class="label">Total Budget</span>
+            <input type="number" id="totalBudget" value="0" oninput="recalculate()" />
+          </div>
+          <div class="summary-item">
+            <span class="label">Total Spent</span>
+            <span class="value" id="totalSpent">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Remaining Balance</span>
+            <span class="value" id="remainingBalance">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Company Payments Total</span>
+            <span class="value" id="companyTotal">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Direct Purchases Total</span>
+            <span class="value" id="directTotal">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Extra Expenses Total</span>
+            <span class="value" id="extraTotal">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Interior Expenses Total</span>
+            <span class="value" id="interiorTotal">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Charts Overview</h2>
+        </div>
+        <div class="grid-2">
+          <canvas id="categoryPie"></canvas>
+          <canvas id="companyDirectBar"></canvas>
+        </div>
+        <div style="margin-top:10px;">
+          <canvas id="monthlyLine"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPANY PAYMENTS -->
+    <section id="tab-company" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Company Payments</h2>
+          <button class="btn-primary" onclick="addCompanyPayment()">Add Payment</button>
+        </div>
+        <form id="companyForm">
+          <div class="field">
+            <label>Category</label>
+            <select id="companyCategory">
+              <option>Foundation</option>
+              <option>Structure</option>
+              <option>Roofing</option>
+              <option>Electrical</option>
+              <option>Plumbing</option>
+              <option>Flooring</option>
+              <option>Painting</option>
+              <option>Interior</option>
+              <option>Final Settlement</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Stage</label>
+            <input type="text" id="companyStage" placeholder="Stage 1 / Stage 2" />
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <input type="text" id="companyDescription" />
+          </div>
+          <div class="field">
+            <label>Planned Amount</label>
+            <input type="number" id="companyPlanned" value="0" />
+          </div>
+          <div class="field">
+            <label>Actual Amount</label>
+            <input type="number" id="companyActual" value="0" />
+          </div>
+          <div class="field">
+            <label>Due Date</label>
+            <input type="date" id="companyDueDate" />
+          </div>
+          <div class="field">
+            <label>Paid Date</label>
+            <input type="date" id="companyPaidDate" />
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="companyStatus">
+              <option>Pending</option>
+              <option>Paid</option>
+              <option>Overdue</option>
+            </select>
+          </div>
+        </form>
+        <table id="companyTable">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Stage</th>
+              <th>Description</th>
+              <th>Planned</th>
+              <th>Actual</th>
+              <th>Due Date</th>
+              <th>Paid Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DIRECT PURCHASES -->
+    <section id="tab-direct" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Direct Material Purchases</h2>
+          <button class="btn-primary" onclick="addDirectPurchase()">Add Purchase</button>
+        </div>
+        <form id="directForm">
+          <div class="field">
+            <label>Material Category</label>
+            <select id="directMaterialCategory">
+              <option>Cement</option>
+              <option>Steel</option>
+              <option>Sand</option>
+              <option>Bricks</option>
+              <option>Tiles</option>
+              <option>Granite</option>
+              <option>Paint</option>
+              <option>Wood</option>
+              <option>Plumbing Materials</option>
+              <option>Electrical Materials</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Item Name</label>
+            <input type="text" id="directItemName" />
+          </div>
+          <div class="field">
+            <label>Vendor</label>
+            <input type="text" id="directVendor" />
+          </div>
+          <div class="field">
+            <label>Quantity</label>
+            <input type="number" id="directQuantity" value="0" />
+          </div>
+          <div class="field">
+            <label>Unit Price</label>
+            <input type="number" id="directUnitPrice" value="0" />
+          </div>
+          <div class="field">
+            <label>Total Amount</label>
+            <input type="number" id="directTotalAmount" value="0" />
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="directDate" />
+          </div>
+          <div class="field">
+            <label>Linked Construction Category</label>
+            <input type="text" id="directLinkedCategory" placeholder="e.g. Structural Materials" />
+          </div>
+        </form>
+        <table id="directTable">
+          <thead>
+            <tr>
+              <th>Material Category</th>
+              <th>Item Name</th>
+              <th>Vendor</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Total Amount</th>
+              <th>Date</th>
+              <th>Linked Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EXTRA EXPENSES -->
+    <section id="tab-extra" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Extra Expenses</h2>
+          <button class="btn-primary" onclick="addExtraExpense()">Add Expense</button>
+        </div>
+        <form id="extraForm">
+          <div class="field">
+            <label>Category</label>
+            <select id="extraCategory">
+              <option>Transport</option>
+              <option>Permit Fees</option>
+              <option>Tool Rentals</option>
+              <option>Snacks for Workers</option>
+              <option>Miscellaneous</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <input type="text" id="extraDescription" />
+          </div>
+          <div class="field">
+            <label>Amount</label>
+            <input type="number" id="extraAmount" value="0" />
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="extraDate" />
+          </div>
+        </form>
+        <table id="extraTable">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INTERIOR -->
+    <section id="tab-interior" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Interior Expenses</h2>
+          <button class="btn-primary" onclick="addInteriorExpense()">Add Interior</button>
+        </div>
+        <form id="interiorForm">
+          <div class="field">
+            <label>Room</label>
+            <select id="interiorRoom">
+              <option>Living Room</option>
+              <option>Bedroom 1</option>
+              <option>Bedroom 2</option>
+              <option>Kitchen</option>
+              <option>Dining</option>
+              <option>Balcony</option>
+              <option>Bathroom</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="interiorCategory">
+              <option>Furniture</option>
+              <option>Lighting</option>
+              <option>Decor</option>
+              <option>Carpentry</option>
+              <option>False Ceiling</option>
+              <option>Painting</option>
+              <option>Appliances</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Item Name</label>
+            <input type="text" id="interiorItemName" />
+          </div>
+          <div class="field">
+            <label>Vendor</label>
+            <input type="text" id="interiorVendor" />
+          </div>
+          <div class="field">
+            <label>Amount</label>
+            <input type="number" id="interiorAmount" value="0" />
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="interiorDate" />
+          </div>
+        </form>
+        <table id="interiorTable">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Category</th>
+              <th>Item Name</th>
+              <th>Vendor</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="tab-reports" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Reports</h2>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);">
+          Generate downloadable reports from your current data.
+        </p>
+        <button class="btn-primary" onclick="downloadPDF()">Download PDF Report</button>
+        <button class="btn-primary" onclick="downloadExcel()">Download Excel Report</button>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Settings</h2>
+        </div>
+        <div style="font-size:13px;">
+          <p><strong>Login:</strong> Basic check (any non-empty username & password).</p>
+          <p><strong>Currency:</strong> Display only (no conversion yet).</p>
+          <p><strong>Dark Mode:</strong> Toggle button in header.</p>
+          <p><strong>Local Storage:</strong> All data is saved in your browser.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const STORAGE_KEY = 'dream_home_construction_v1';
+  let state = {
+    currency: 'AED',
+    budget: 0,
+    company: [],
+    direct: [],
+    extra: [],
+    interior: [],
+    dark: false
+  };
+
+  function loadState() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try { state = JSON.parse(raw); } catch (e) {}
+    }
+  }
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function handleLogin() {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    if (!user || !pass) {
+      document.getElementById('loginError').textContent = 'Please enter username and password.';
+      return;
+    }
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+  }
+
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === name);
+    });
+    document.querySelectorAll('main section').forEach(sec => {
+      sec.classList.toggle('hidden', sec.id !== 'tab-' + name);
+    });
+  }
+
+  function toggleDarkMode() {
+    state.dark = !state.dark;
+    document.body.classList.toggle('dark', state.dark);
+    saveState();
+  }
+
+  function setCurrency(cur) {
+    state.currency = cur;
+    saveState();
+    recalculate();
+  }
+
+  function formatCurrency(value) {
+    return `${state.currency} ${Number(value || 0).toFixed(2)}`;
+  }
+
+  function renderTables() {
+    const cBody = document.querySelector('#companyTable tbody');
+    cBody.innerHTML = '';
+    state.company.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      [
+        row.category,
+        row.stage,
+        row.description,
+        formatCurrency(row.planned),
+        formatCurrency(row.actual),
+        row.dueDate,
+        row.paidDate,
+        row.status
+      ].forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      const tdActions = document.createElement('td');
+      tdActions.className = 'actions';
+      tdActions.innerHTML = `
+        <button class="btn-outline" onclick="editCompany(${idx})">Edit</button>
+        <button class="btn-danger" onclick="deleteCompany(${idx})">Delete</button>
+      `;
+      tr.appendChild(tdActions);
+      cBody.appendChild(tr);
+    });
+
+    const dBody = document.querySelector('#directTable tbody');
+    dBody.innerHTML = '';
+    state.direct.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      [
+        row.materialCategory,
+        row.itemName,
+        row.vendor,
+        row.quantity,
+        formatCurrency(row.unitPrice),
+        formatCurrency(row.totalAmount),
+        row.date,
+        row.linkedCategory
+      ].forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      const tdActions = document.createElement('td');
+      tdActions.className = 'actions';
+      tdActions.innerHTML = `
+        <button class="btn-outline" onclick="editDirect(${idx})">Edit</button>
+        <button class="btn-danger" onclick="deleteDirect(${idx})">Delete</button>
+      `;
+      tr.appendChild(tdActions);
+      dBody.appendChild(tr);
+    });
+
+    const eBody = document.querySelector('#extraTable tbody');
+    eBody.innerHTML = '';
+    state.extra.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      [
+        row.category,
+        row.description,
+        formatCurrency(row.amount),
+        row.date
+      ].forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      const tdActions = document.createElement('td');
+      tdActions.className = 'actions';
+      tdActions.innerHTML = `
+        <button class="btn-outline" onclick="editExtra(${idx})">Edit</button>
+        <button class="btn-danger" onclick="deleteExtra(${idx})">Delete</button>
+      `;
+      tr.appendChild(tdActions);
+      eBody.appendChild(tr);
+    });
+
+    const iBody = document.querySelector('#interiorTable tbody');
+    iBody.innerHTML = '';
+    state.interior.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      [
+        row.room,
+        row.category,
+        row.itemName,
+        row.vendor,
+        formatCurrency(row.amount),
+        row.date
+      ].forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      const tdActions = document.createElement('td');
+      tdActions.className = 'actions';
+      tdActions.innerHTML = `
+        <button class="btn-outline" onclick="editInterior(${idx})">Edit</button>
+        <button class="btn-danger" onclick="deleteInterior(${idx})">Delete</button>
+      `;
+      tr.appendChild(tdActions);
+      iBody.appendChild(tr);
+    });
+  }
+
+  function addCompanyPayment() {
+    const row = {
+      category: document.getElementById('companyCategory').value,
+      stage: document.getElementById('companyStage').value,
+      description: document.getElementById('companyDescription').value,
+      planned: parseFloat(document.getElementById('companyPlanned').value || 0),
+      actual: parseFloat(document.getElementById('companyActual').value || 0),
+      dueDate: document.getElementById('companyDueDate').value,
+      paidDate: document.getElementById('companyPaidDate').value,
+      status: document.getElementById('companyStatus').value
+    };
+    state.company.push(row);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function editCompany(idx) {
+    const row = state.company[idx];
+    document.getElementById('companyCategory').value = row.category;
+    document.getElementById('companyStage').value = row.stage;
+    document.getElementById('companyDescription').value = row.description;
+    document.getElementById('companyPlanned').value = row.planned;
+    document.getElementById('companyActual').value = row.actual;
+    document.getElementById('companyDueDate').value = row.dueDate;
+    document.getElementById('companyPaidDate').value = row.paidDate;
+    document.getElementById('companyStatus').value = row.status;
+    state.company.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function deleteCompany(idx) {
+    state.company.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+
+  function addDirectPurchase() {
+    let qty = parseFloat(document.getElementById('directQuantity').value || 0);
+    let unit = parseFloat(document.getElementById('directUnitPrice').value || 0);
+    let total = parseFloat(document.getElementById('directTotalAmount').value || 0);
+    if (!total) total = qty * unit;
+    const row = {
+      materialCategory: document.getElementById('directMaterialCategory').value,
+      itemName: document.getElementById('directItemName').value,
+      vendor: document.getElementById('directVendor').value,
+      quantity: qty,
+      unitPrice: unit,
+      totalAmount: total,
+      date: document.getElementById('directDate').value,
+      linkedCategory: document.getElementById('directLinkedCategory').value
+    };
+    state.direct.push(row);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function editDirect(idx) {
+    const row = state.direct[idx];
+    document.getElementById('directMaterialCategory').value = row.materialCategory;
+    document.getElementById('directItemName').value = row.itemName;
+    document.getElementById('directVendor').value = row.vendor;
+    document.getElementById('directQuantity').value = row.quantity;
+    document.getElementById('directUnitPrice').value = row.unitPrice;
+    document.getElementById('directTotalAmount').value = row.totalAmount;
+    document.getElementById('directDate').value = row.date;
+    document.getElementById('directLinkedCategory').value = row.linkedCategory;
+    state.direct.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function deleteDirect(idx) {
+    state.direct.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+
+  function addExtraExpense() {
+    const row = {
+      category: document.getElementById('extraCategory').value,
+      description: document.getElementById('extraDescription').value,
+      amount: parseFloat(document.getElementById('extraAmount').value || 0),
+      date: document.getElementById('extraDate').value
+    };
+    state.extra.push(row);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function editExtra(idx) {
+    const row = state.extra[idx];
+    document.getElementById('extraCategory').value = row.category;
+    document.getElementById('extraDescription').value = row.description;
+    document.getElementById('extraAmount').value = row.amount;
+    document.getElementById('extraDate').value = row.date;
+    state.extra.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function deleteExtra(idx) {
+    state.extra.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+
+  function addInteriorExpense() {
+    const row = {
+      room: document.getElementById('interiorRoom').value,
+      category: document.getElementById('interiorCategory').value,
+      itemName: document.getElementById('interiorItemName').value,
+      vendor: document.getElementById('interiorVendor').value,
+      amount: parseFloat(document.getElementById('interiorAmount').value || 0),
+      date: document.getElementById('interiorDate').value
+    };
+    state.interior.push(row);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function editInterior(idx) {
+    const row = state.interior[idx];
+    document.getElementById('interiorRoom').value = row.room;
+    document.getElementById('interiorCategory').value = row.category;
+    document.getElementById('interiorItemName').value = row.itemName;
+    document.getElementById('interiorVendor').value = row.vendor;
+    document.getElementById('interiorAmount').value = row.amount;
+    document.getElementById('interiorDate').value = row.date;
+    state.interior.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+  function deleteInterior(idx) {
+    state.interior.splice(idx, 1);
+    saveState();
+    renderTables();
+    recalculate();
+  }
+
+  let pieChart, barChart, lineChart;
+
+  function recalculate() {
+    state.budget = parseFloat(document.getElementById('totalBudget').value || 0);
+
+    const companyTotal = state.company.reduce((s, r) => s + (r.actual || 0), 0);
+    const directTotal = state.direct.reduce((s, r) => s + (r.totalAmount || 0), 0);
+    const extraTotal = state.extra.reduce((s, r) => s + (r.amount || 0), 0);
+    const interiorTotal = state.interior.reduce((s, r) => s + (r.amount || 0), 0);
+
+    const totalSpent = companyTotal + directTotal + extraTotal + interiorTotal;
+    const remaining = state.budget - totalSpent;
+
+    document.getElementById('companyTotal').textContent = formatCurrency(companyTotal);
+    document.getElementById('directTotal').textContent = formatCurrency(directTotal);
+    document.getElementById('extraTotal').textContent = formatCurrency(extraTotal);
+    document.getElementById('interiorTotal').textContent = formatCurrency(interiorTotal);
+    document.getElementById('totalSpent').textContent = formatCurrency(totalSpent);
+    document.getElementById('remainingBalance').textContent = formatCurrency(remaining);
+
+    saveState();
+    updateCharts(companyTotal, directTotal, extraTotal, interiorTotal);
+  }
+
+  function updateCharts(companyTotal, directTotal, extraTotal, interiorTotal) {
+    const ctxPie = document.getElementById('categoryPie').getContext('2d');
+    const ctxBar = document.getElementById('companyDirectBar').getContext('2d');
+    const ctxLine = document.getElementById('monthlyLine').getContext('2d');
+
+    const catData = [companyTotal, directTotal, extraTotal, interiorTotal];
+
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: ['Company', 'Direct', 'Extra', 'Interior'],
+        datasets: [{
+          data: catData,
+          backgroundColor: ['#2563eb', '#10b981', '#f97316', '#8b5cf6']
+        }]
+      },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+
+    if (barChart) barChart.destroy();
+    barChart = new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Company', 'Direct'],
+        datasets: [{
+          label: 'Amount',
+          data: [companyTotal, directTotal],
+          backgroundColor: ['#2563eb', '#10b981']
+        }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    const monthMap = {};
+    function addMonth(dateStr, amount) {
+      if (!dateStr) return;
+      const m = dateStr.slice(0, 7);
+      monthMap[m] = (monthMap[m] || 0) + (amount || 0);
+    }
+    state.company.forEach(r => addMonth(r.paidDate || r.dueDate, r.actual));
+    state.direct.forEach(r => addMonth(r.date, r.totalAmount));
+    state.extra.forEach(r => addMonth(r.date, r.amount));
+    state.interior.forEach(r => addMonth(r.date, r.amount));
+
+    const months = Object.keys(monthMap).sort();
+    const values = months.map(m => monthMap[m]);
+
+    if (lineChart) lineChart.destroy();
+    lineChart = new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Monthly Spending',
+          data: values,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,0.2)',
+          tension: 0.2
+        }]
+      },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  function exportCSV(filename, rows, headers) {
+    let csv = headers.join(',') + '\n';
+    rows.forEach(r => {
+      const line = headers.map(h => {
+        let v = r[h];
+        if (typeof v === 'string') {
+          v = '"' + v.replace(/"/g, '""') + '"';
+        }
+        return v;
+      }).join(',');
+      csv += line + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportAllCSV() {
+    if (state.company.length) {
+      exportCSV('company_payments.csv', state.company, [
+        'category','stage','description','planned','actual','dueDate','paidDate','status'
+      ]);
+    }
+    if (state.direct.length) {
+      exportCSV('direct_purchases.csv', state.direct, [
+        'materialCategory','itemName','vendor','quantity','unitPrice','totalAmount','date','linkedCategory'
+      ]);
+    }
+    if (state.extra.length) {
+      exportCSV('extra_expenses.csv', state.extra, [
+        'category','description','amount','date'
+      ]);
+    }
+    if (state.interior.length) {
+      exportCSV('interior_expenses.csv', state.interior, [
+        'room','category','itemName','vendor','amount','date'
+      ]);
+    }
+  }
+
+  // -------- PDF REPORT ----------
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Dream Home Construction Report", 10, 10);
+
+    doc.setFontSize(12);
+    doc.text(`Total Budget: ${formatCurrency(state.budget)}`, 10, 25);
+    doc.text(`Total Spent: ${document.getElementById('totalSpent').textContent}`, 10, 35);
+    doc.text(`Remaining Balance: ${document.getElementById('remainingBalance').textContent}`, 10, 45);
+
+    doc.text("Company Payments:", 10, 60);
+    state.company.forEach((r, i) => {
+      doc.text(
+        `${i+1}. ${r.category} - ${formatCurrency(r.actual)} (${r.status})`,
+        10,
+        70 + i * 10
+      );
+    });
+
+    doc.save("construction-report.pdf");
+  }
+
+  // -------- EXCEL REPORT ----------
+  function downloadExcel() {
+    const wb = XLSX.utils.book_new();
+
+    const companySheet = XLSX.utils.json_to_sheet(state.company);
+    XLSX.utils.book_append_sheet(wb, companySheet, "Company Payments");
+
+    const directSheet = XLSX.utils.json_to_sheet(state.direct);
+    XLSX.utils.book_append_sheet(wb, directSheet, "Direct Purchases");
+
+    const extraSheet = XLSX.utils.json_to_sheet(state.extra);
+    XLSX.utils.book_append_sheet(wb, extraSheet, "Extra Expenses");
+
+    const interiorSheet = XLSX.utils.json_to_sheet(state.interior);
+    XLSX.utils.book_append_sheet(wb, interiorSheet, "Interior");
+
+    XLSX.writeFile(wb, "construction-report.xlsx");
+  }
+
+  loadState();
+  document.getElementById('currencySelect').value = state.currency || 'AED';
+  document.body.classList.toggle('dark', state.dark);
+  document.getElementById('totalBudget').value = state.budget || 0;
+  renderTables();
+  recalculate();
+</script>
+
+</body>
+</html>
